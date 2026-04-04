@@ -2,7 +2,7 @@
 
 LLM-powered command generator for zsh. Type a natural language request, press a key, and get a shell command.
 
-Works with **any LLM CLI or wrapper** that reads from stdin and writes to stdout.
+Works with **any LLM backend (CLI or wrapper)** that reads from stdin and writes to stdout.
 
 ## Usage
 
@@ -22,11 +22,11 @@ Press **Alt+G** to search previous requests with `fzf`.
 
 ## Install
 
-> [!WARNING]
-> This plugin can generate dangerous commands. Read the [Disclaimer](#%EF%B8%8F-disclaimer) and make sure you understand the risks before use.
-
 > [!NOTE]
 > This plugin does not include an LLM. You need to install an LLM CLI tool (e.g., `claude`, `ollama`) separately and set `ZSH_SPELLINE_CMD` to point to it.
+
+> [!WARNING]
+> Your LLM backend may generate dangerous commands. Read the [Disclaimer](#%EF%B8%8F-disclaimer) and make sure you understand the risks before use.
 
 ### Oh My Zsh
 
@@ -67,6 +67,9 @@ export ZSH_SPELLINE_CMD="ollama run qwen2.5-coder"
 # Claude
 export ZSH_SPELLINE_CMD="claude -p --bare --no-session-persistence"
 
+# OpenAI Codex CLI
+export ZSH_SPELLINE_CMD="codex exec -"
+
 # Any command that reads stdin and writes stdout
 export ZSH_SPELLINE_CMD="my-custom-llm --flag"
 ```
@@ -79,7 +82,7 @@ Set these variables in `.zshrc` **before** the plugin is loaded:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ZSH_SPELLINE_KEYBINDING` | `^G` (Ctrl+G) | Keybinding to trigger generation (empty = no auto-bind) |
+| `ZSH_SPELLINE_KEYBINDING` | `^G` (Ctrl+G) | Keybinding to trigger generation |
 | `ZSH_SPELLINE_HISTORY_KEYBINDING` | `^[g` (Alt+G) | Keybinding for history search |
 | `ZSH_SPELLINE_CMD` | (empty) | LLM CLI command (reads stdin, writes stdout) |
 | `ZSH_SPELLINE_CONTEXT_LINES` | `50` | Tmux scrollback lines to include as context |

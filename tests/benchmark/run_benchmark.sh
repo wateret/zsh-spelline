@@ -189,7 +189,7 @@ while IFS= read -r line; do
   local exec_stderr="/tmp/bench_exec_err_${id}_$$"
 
   local exec_start=$EPOCHREALTIME
-  (cd "$sandbox" && HOME="$sandbox" $_bench_timeout $BENCH_TIMEOUT zsh -c "$command") > "$exec_stdout" 2>"$exec_stderr"
+  (cd "$sandbox" && HOME="$sandbox" $_bench_timeout $BENCH_TIMEOUT zsh -c "$command") > "$exec_stdout" 2>"$exec_stderr" </dev/null
   local exec_exit=$?
   local exec_elapsed=$(printf '%.2f' $(( EPOCHREALTIME - exec_start )))
 
