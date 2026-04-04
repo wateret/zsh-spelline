@@ -4,14 +4,16 @@ LLM-powered command generator for zsh. Type a natural language request, press a 
 
 Works with **any LLM backend (CLI or wrapper)** that reads from stdin and writes to stdout.
 
+![zsh-spelline demo](./demo.gif)
+
 ## Usage
 
 Type a natural language description of what you want, then press **Ctrl+G** (default).
 
-```
-$ list files larger than 100MB
+``` 
+$ show which process is using port 3000
   ↓ [Ctrl+G]
-$ find . -type f -size +100M
+$ lsof -i :3000
 ```
 
 Multiple candidates are shown via `fzf` when applicable.
