@@ -22,9 +22,9 @@ tmux_session_send "$SESSION" "slow request"
 sleep 0.3
 tmux_session_send_key "$SESSION" C-g
 
-if tmux_session_wait_for "$SESSION" "Asking" 5; then
+if tmux_session_wait_for "$SESSION" "Spellining via" 5; then
   local capture=$(tmux_session_capture "$SESSION")
-  assert_contains "$capture" "Asking" "spinner text visible"
+  assert_contains "$capture" "Spellining via" "spinner text visible"
 else
   _harness_not_ok "spinner text visible" \
     "spinner never appeared within 5s" \

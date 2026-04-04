@@ -221,13 +221,13 @@ LOGEOF
   local _n=${#_spin_chars[@]}
   local _anim_colors=(39 38 44 43 49 48 84 83 119 118 154 153 189 188 183 182 177 176 171 170 135 134 99 98 63 62)
   local _nc=${#_anim_colors[@]}
-  local _llm_name=${ZSH_SPELLINE_CMD%% *}
-  (( ${#_llm_name} == 0 || ${#_llm_name} > 32 )) && _llm_name="LLM"
+  local _cmd_name=${ZSH_SPELLINE_CMD%% *}
+  (( ${#_cmd_name} == 0 || ${#_cmd_name} > 32 )) && _cmd_name="LLM"
   local _pstart=${#BUFFER}
   local _spin_i=0
   while kill -0 $_pid 2>/dev/null; do
     local _sc=${_spin_chars[$(( _spin_i % _n + 1 ))]}
-    local _msg="${_sc} Asking ${_llm_name}"
+    local _msg="${_sc} Spellining via ${_cmd_name}"
     if (( ZSH_SPELLINE_VERBOSE_AFTER > 0 )) && (( EPOCHREALTIME - start_time >= ZSH_SPELLINE_VERBOSE_AFTER )); then
       _msg+=" (^C or ESC to cancel) $(printf '%4.1f' $(( EPOCHREALTIME - start_time )))s"
     fi

@@ -23,7 +23,7 @@ sleep 0.3
 tmux_session_send_key "$SESSION" C-g
 
 # wait for spinner to appear
-if tmux_session_wait_for "$SESSION" "Asking" 5; then
+if tmux_session_wait_for "$SESSION" "Spellining via" 5; then
   # cancel
   tmux_session_send_key "$SESSION" C-c
   sleep 1
@@ -33,7 +33,7 @@ if tmux_session_wait_for "$SESSION" "Asking" 5; then
 
   # spinner should be gone
   local capture=$(tmux_session_capture "$SESSION")
-  assert_not_contains "$capture" "Asking" "spinner cleared after cancel"
+  assert_not_contains "$capture" "Spellining via" "spinner cleared after cancel"
 else
   _harness_not_ok "original buffer restored after cancel" \
     "spinner never appeared" \

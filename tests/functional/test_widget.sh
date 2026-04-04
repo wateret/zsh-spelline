@@ -46,7 +46,7 @@ local buf=$(tmux_session_buffer "$SESSION")
 assert_equals "" "$buf" "buffer stays empty"
 
 local capture=$(tmux_session_capture "$SESSION")
-assert_not_contains "$capture" "Asking" "no spinner appeared"
+assert_not_contains "$capture" "Spellining via" "no spinner appeared"
 
 tmux_session_destroy "$SESSION"
 
