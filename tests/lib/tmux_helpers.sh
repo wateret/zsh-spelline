@@ -65,7 +65,7 @@ tmux_session_source_plugin() {
   if [[ -n "$cmd_override" ]]; then
     tmux_session_send "$name" "ZSH_SPELLINE_CMD='${cmd_override}'"
     tmux_session_send_key "$name" Enter
-    sleep 0.3
+    sleep 1
   fi
   tmux_session_send "$name" "source '${plugin_path}'"
   tmux_session_send_key "$name" Enter
