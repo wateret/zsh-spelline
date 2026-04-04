@@ -19,21 +19,32 @@ tmux_session_start "$SESSION"
 # set custom keybinding before sourcing
 tmux_session_send "$SESSION" "ZSH_SPELLINE_KEYBINDING='^X^G'"
 tmux_session_send_key "$SESSION" Enter
-sleep 0.3
+sleep 2
 tmux_session_source_plugin "$SESSION" "zsh ${MOCK_SINGLE}"
-sleep 0.5
+sleep 2
 
 tmux_session_send "$SESSION" "test custom key"
-sleep 0.3
-
-# Ctrl+G should NOT trigger (not our keybinding anymore)
-tmux_session_send_key "$SESSION" C-g
 sleep 1
-local buf=$(tmux_session_buffer "$SESSION")
-# buffer should still have original text (Ctrl+G didn't fire widget)
-assert_contains "$buf" "test custom key" "Ctrl+G does not trigger with custom keybinding"
+
+# Ctrl+G should NOT trigger the spelline widget (not our keybinding anymore)
+tmux_session_send_key "$SESSION" C-g
+sleep 2
+# verify the mock output did NOT appear (widget was not triggered)
+local capture=$(tmux_session_capture "$SESSION")
+if [[ "$capture" != *"ls -la /tmp"* ]]; then
+  _harness_ok "Ctrl+G does not trigger with custom keybinding"
+else
+  _harness_not_ok "Ctrl+G does not trigger with custom keybinding" \
+    "widget was triggered by Ctrl+G"
+fi
+
+# clear buffer for next test
+tmux_session_send_key "$SESSION" C-u
+sleep 0.5
 
 # Ctrl+X Ctrl+G should trigger
+tmux_session_send "$SESSION" "test trigger"
+sleep 0.5
 tmux_session_send_key "$SESSION" C-x
 tmux_session_send_key "$SESSION" C-g
 
@@ -53,12 +64,12 @@ test_begin "verbose_after shows cancel hint after threshold"
 tmux_session_start "$SESSION"
 tmux_session_send "$SESSION" "ZSH_SPELLINE_VERBOSE_AFTER=2"
 tmux_session_send_key "$SESSION" Enter
-sleep 0.3
+sleep 1
 tmux_session_source_plugin "$SESSION" "zsh ${MOCK_SLOW}"
-sleep 0.5
+sleep 1
 
 tmux_session_send "$SESSION" "verbose test"
-sleep 0.3
+sleep 0.5
 tmux_session_send_key "$SESSION" C-g
 
 # before threshold: cancel hint should NOT be visible
@@ -86,12 +97,12 @@ local log_dir="/tmp/spelline_test_logs_$$"
 tmux_session_start "$SESSION"
 tmux_session_send "$SESSION" "ZSH_SPELLINE_LOG_DIR='${log_dir}'"
 tmux_session_send_key "$SESSION" Enter
-sleep 0.3
+sleep 1
 tmux_session_source_plugin "$SESSION" "zsh ${MOCK_SINGLE}"
-sleep 0.5
+sleep 1
 
 tmux_session_send "$SESSION" "log test"
-sleep 0.3
+sleep 0.5
 tmux_session_send_key "$SESSION" C-g
 
 tmux_session_wait_for "$SESSION" "ls -la /tmp" 10
@@ -116,9 +127,9 @@ local hist_file="/tmp/spelline_test_history_$$"
 tmux_session_start "$SESSION"
 tmux_session_send "$SESSION" "ZSH_SPELLINE_HISTORY_FILE='${hist_file}'"
 tmux_session_send_key "$SESSION" Enter
-sleep 0.3
+sleep 1
 tmux_session_source_plugin "$SESSION" "zsh ${MOCK_SINGLE}"
-sleep 0.5
+sleep 1
 
 tmux_session_send "$SESSION" "history test request"
 sleep 0.3

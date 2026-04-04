@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  functional-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install zsh and tmux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh tmux
+
+      - name: Show versions
+        run: |
+          zsh --version
+          tmux -V
+
+      - name: Run functional tests
+        run: zsh tests/run_all.sh functional
