@@ -38,8 +38,6 @@ zmodload zsh/datetime 2>/dev/null
 : ${ZSH_SPELLINE_HISTORY_KEYBINDING='^[g'}  # history search keybinding (Alt+G)
 
 : ${ZSH_SPELLINE_CMD:=""}                   # LLM CLI command (stdin → stdout)
-: ${ZSH_SPELLINE_CONTEXT_LINES:=50}        # tmux scrollback lines to send
-: ${ZSH_SPELLINE_HISTORY_LINES:=50}        # recent history entries to send
 : ${ZSH_SPELLINE_LOG_DIR:=""}              # log directory (empty = no logging)
 : ${ZSH_SPELLINE_MAX_CANDIDATES:=10}       # max candidates for multi-option responses
 : ${ZSH_SPELLINE_SPINNER:=braille}         # spinner style: braille, ascii
@@ -85,17 +83,44 @@ _spelline_git_info() {
 }
 
 _spelline_history() {
-  fc -l -${ZSH_SPELLINE_HISTORY_LINES} 2>/dev/null \
+  local history_lines=50
+  fc -l -${history_lines} 2>/dev/null \
     | sed 's/^[[:space:]]*[0-9]*[[:space:]]*//' \
-    | tail -c $(( ZSH_SPELLINE_HISTORY_LINES * 200 ))
+    | tail -c $(( history_lines * 200 ))
+}
+
+_spelline_record_history() {
+  local user_input="$1"
+  local hist_file="$ZSH_SPELLINE_HISTORY_FILE"
+  local hist_max=200
+  local max_input_bytes=2048
+  [[ -z "$hist_file" ]] && return
+  (( ${#user_input} <= max_input_bytes )) || return
+
+  local tmpfile="${TMPDIR:-/tmp}/spelline_hist_$$"
+  local trimfile="${TMPDIR:-/tmp}/spelline_hist_trim_$$"
+  if [[ -r "$hist_file" ]]; then
+    awk -v line="$user_input" '$0 != line' "$hist_file" > "$tmpfile" 2>/dev/null || : > "$tmpfile"
+  else
+    : > "$tmpfile"
+  fi
+  print -r -- "$user_input" >> "$tmpfile"
+
+  tail -n "$hist_max" "$tmpfile" > "$trimfile" 2>/dev/null || cp "$tmpfile" "$trimfile"
+  mv "$trimfile" "$hist_file" 2>/dev/null || {
+    rm -f "$tmpfile" "$trimfile"
+    print -r -- "$user_input" >> "$hist_file"
+  }
+  rm -f "$tmpfile" "$trimfile"
 }
 
 _spelline_tmux_context() {
+  local context_lines=50
   [[ -z "$TMUX" ]] && return
-  tmux capture-pane -p -S -${ZSH_SPELLINE_CONTEXT_LINES} 2>/dev/null \
+  tmux capture-pane -p -S -${context_lines} 2>/dev/null \
     | sed -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' -e '/^[[:space:]]*$/d' \
-    | tail -n ${ZSH_SPELLINE_CONTEXT_LINES} \
-    | tail -c $(( ZSH_SPELLINE_CONTEXT_LINES * 200 ))
+    | tail -n ${context_lines} \
+    | tail -c $(( context_lines * 200 ))
 }
 
 # ── prompt builder ────────────────────────────────────────────────────────────
@@ -103,6 +128,7 @@ _spelline_tmux_context() {
 # Override via ZSH_SPELLINE_PROMPT_FUNC to customize.
 _spelline_build_prompt() {
   local request="$1"
+  local context_lines=50
   local git_info=$(_spelline_git_info)
   local hist=$(_spelline_history)
   local context=$(_spelline_tmux_context)
@@ -120,7 +146,7 @@ ${hist:+- Recent history (for reference only; commands listed may have failed):
 ${hist}
 \`\`\`}
 ${context:+
-- Terminal output (last ${ZSH_SPELLINE_CONTEXT_LINES} lines):
+- Terminal output (last ${context_lines} lines):
 \`\`\`
 ${context}
 \`\`\`}
@@ -166,7 +192,7 @@ _spelline_generate() {
 
   # ── save to history ──────────────────────────────────────────────────────
   if [[ -n "$ZSH_SPELLINE_HISTORY_FILE" ]]; then
-    print -r -- "$user_input" >> "$ZSH_SPELLINE_HISTORY_FILE"
+    _spelline_record_history "$user_input"
   fi
 
   # ── log prompt ────────────────────────────────────────────────────────────
@@ -178,14 +204,15 @@ _spelline_generate() {
 
 \`\`\`
 ZSH_SPELLINE_CMD=${ZSH_SPELLINE_CMD}
-ZSH_SPELLINE_CONTEXT_LINES=${ZSH_SPELLINE_CONTEXT_LINES}
-ZSH_SPELLINE_HISTORY_LINES=${ZSH_SPELLINE_HISTORY_LINES}
+ZSH_SPELLINE_KEYBINDING=${ZSH_SPELLINE_KEYBINDING}
+ZSH_SPELLINE_HISTORY_KEYBINDING=${ZSH_SPELLINE_HISTORY_KEYBINDING}
+ZSH_SPELLINE_LOG_DIR=${ZSH_SPELLINE_LOG_DIR}
 ZSH_SPELLINE_MAX_CANDIDATES=${ZSH_SPELLINE_MAX_CANDIDATES}
 ZSH_SPELLINE_SPINNER=${ZSH_SPELLINE_SPINNER}
 ZSH_SPELLINE_SPINNER_COLOR=${ZSH_SPELLINE_SPINNER_COLOR}
 ZSH_SPELLINE_VERBOSE_AFTER=${ZSH_SPELLINE_VERBOSE_AFTER}
-ZSH_SPELLINE_KEYBINDING=${ZSH_SPELLINE_KEYBINDING}
 ZSH_SPELLINE_PROMPT_FUNC=${ZSH_SPELLINE_PROMPT_FUNC}
+ZSH_SPELLINE_HISTORY_FILE=${ZSH_SPELLINE_HISTORY_FILE}
 \`\`\`
 
 # Prompt
@@ -324,7 +351,7 @@ fi
 _spelline_history_search() {
   [[ ! -r "$ZSH_SPELLINE_HISTORY_FILE" ]] && return
   if (( ! $+commands[fzf] )); then
-    zle -M "[zsh-spelline] fzf is required for history search"
+    zle -M "[zsh-spelline] ✗ fzf is required for history search"
     return
   fi
   local selected
