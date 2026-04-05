@@ -145,6 +145,55 @@ else
     "history file missing or does not contain expected input"
 fi
 
+tmux_session_send_key "$SESSION" C-c
+sleep 0.3
+tmux_session_send_key "$SESSION" C-u
+sleep 0.3
+tmux_session_send "$SESSION" "history test request"
+sleep 0.3
+tmux_session_send_key "$SESSION" C-g
+tmux_session_wait_for "$SESSION" "ls -la /tmp" 10
+sleep 0.5
+
+local hist_dupe_count=$(grep -c '^history test request$' "$hist_file" 2>/dev/null || true)
+assert_equals "1" "$hist_dupe_count" "history file deduplicates repeated requests"
+
+rm -f "$hist_file"
+local i=1
+while (( i <= 205 )); do
+  print -r -- "history-entry-$i" >> "$hist_file"
+  i=$(( i + 1 ))
+done
+
+tmux_session_send_key "$SESSION" C-c
+sleep 0.3
+tmux_session_send_key "$SESSION" C-u
+sleep 0.3
+tmux_session_send "$SESSION" "history newest request"
+sleep 0.3
+tmux_session_send_key "$SESSION" C-g
+tmux_session_wait_for "$SESSION" "ls -la /tmp" 10
+sleep 0.5
+
+local hist_line_count=$(wc -l < "$hist_file" | tr -d ' ')
+assert_equals "200" "$hist_line_count" "history file is capped at 200 entries"
+assert_true "history file drops oldest entries when capped" "! grep -q '^history-entry-1$' '$hist_file'"
+assert_true "history file keeps newest request when capped" "grep -q '^history newest request$' '$hist_file'"
+
+local oversized_input=$(printf 'x%.0s' {1..2049})
+local oversized_input_len=${#oversized_input}
+tmux_session_send_key "$SESSION" C-c
+sleep 0.3
+tmux_session_send_key "$SESSION" C-u
+sleep 0.3
+tmux_session_send "$SESSION" "$oversized_input"
+sleep 0.3
+tmux_session_send_key "$SESSION" C-g
+tmux_session_wait_for "$SESSION" "ls -la /tmp" 10
+sleep 0.5
+
+assert_true "history file skips requests over 2KiB" "! awk -v n='$oversized_input_len' 'length(\$0) == n { found=1 } END { exit found ? 0 : 1 }' '$hist_file'"
+
 # cleanup
 rm -f "$hist_file"
 tmux_session_destroy "$SESSION"

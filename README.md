@@ -87,8 +87,6 @@ Set these variables in `.zshrc` **before** the plugin is loaded:
 | **`ZSH_SPELLINE_CMD`** | (empty) | LLM CLI command (reads stdin, writes stdout) |
 | **`ZSH_SPELLINE_KEYBINDING`** | `^G` (Ctrl+G) | Keybinding to trigger generation |
 | **`ZSH_SPELLINE_HISTORY_KEYBINDING`** | `^[g` (Alt+G) | Keybinding for history search |
-| `ZSH_SPELLINE_CONTEXT_LINES` | `50` | Tmux scrollback lines to include as context |
-| `ZSH_SPELLINE_HISTORY_LINES` | `50` | Recent shell history entries to include |
 | `ZSH_SPELLINE_LOG_DIR` | (empty) | Directory for prompt/response logs |
 | `ZSH_SPELLINE_MAX_CANDIDATES` | `10` | Max candidates for multi-option responses |
 | `ZSH_SPELLINE_SPINNER` | `braille` | Spinner style: `braille`, `ascii` |
