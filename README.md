@@ -8,7 +8,7 @@ Works with **any LLM backend (CLI or wrapper)** that reads from stdin and writes
 
 ## Usage
 
-Type a natural language description of what you want, then press **Ctrl+G** (default).
+Type a natural language description of what you want, then press **Ctrl+G** (configurable).
 
 ``` 
 $ show which process is using port 3000
@@ -20,7 +20,7 @@ Multiple candidates are shown via `fzf` when applicable.
 
 Press **Ctrl+C** or **ESC** to cancel while waiting for the LLM response.
 
-Press **Alt+G** to search previous requests with `fzf`.
+Press **Alt+G** (configurable) to search previous requests with `fzf`.
 
 ## Install
 
@@ -84,9 +84,9 @@ Set these variables in `.zshrc` **before** the plugin is loaded:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ZSH_SPELLINE_KEYBINDING` | `^G` (Ctrl+G) | Keybinding to trigger generation |
-| `ZSH_SPELLINE_HISTORY_KEYBINDING` | `^[g` (Alt+G) | Keybinding for history search |
-| `ZSH_SPELLINE_CMD` | (empty) | LLM CLI command (reads stdin, writes stdout) |
+| **`ZSH_SPELLINE_CMD`** | (empty) | LLM CLI command (reads stdin, writes stdout) |
+| **`ZSH_SPELLINE_KEYBINDING`** | `^G` (Ctrl+G) | Keybinding to trigger generation |
+| **`ZSH_SPELLINE_HISTORY_KEYBINDING`** | `^[g` (Alt+G) | Keybinding for history search |
 | `ZSH_SPELLINE_CONTEXT_LINES` | `50` | Tmux scrollback lines to include as context |
 | `ZSH_SPELLINE_HISTORY_LINES` | `50` | Recent shell history entries to include |
 | `ZSH_SPELLINE_LOG_DIR` | (empty) | Directory for prompt/response logs |
@@ -105,6 +105,7 @@ ZSH_SPELLINE_KEYBINDING='^[a'  # Alt+A (an example)
 
 ## Requirements
 
+- **macOS** or **Linux**
 - **zsh** 5.0+
 - An LLM CLI (e.g., `claude`, `openai`, `ollama`)
 - **fzf** (optional) — for selecting among multiple candidates and history search
