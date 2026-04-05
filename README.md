@@ -1,4 +1,4 @@
-# 🧙 zsh-spelline
+# 🪄 zsh-spelline
 
 LLM-powered command generator for zsh. Type a natural language request, press a key, and get a shell command.
 
