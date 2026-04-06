@@ -175,6 +175,24 @@ done
 EOF
 }
 
+# ── non-interactive runner (no ZLE dependency) ───────────────────────────────
+# Usage: spelline_query "natural language request"
+# Prints the first candidate to stdout. Returns 1 if no result.
+spelline_query() {
+  local request="$1"
+  [[ -z "$request" ]] && return 1
+  [[ -z "$ZSH_SPELLINE_CMD" ]] && return 1
+
+  local prompt=$("$ZSH_SPELLINE_PROMPT_FUNC" "$request")
+  local result=$(echo "$prompt" | ${=ZSH_SPELLINE_CMD} 2>/dev/null)
+  [[ -z "$result" ]] && return 1
+
+  _spelline_parse_result "$result"
+  [[ ${#_spelline_candidates[@]} -eq 0 ]] && return 1
+  echo "${_spelline_candidates[1]}"
+}
+
+
 # ── core widget ───────────────────────────────────────────────────────────────
 _spelline_generate() {
   setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR

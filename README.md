@@ -80,20 +80,13 @@ The plugin will not work until this variable is set.
 
 ## Configuration
 
-Set these variables in `.zshrc` **before** the plugin is loaded:
+See [Documentation](doc.md) for full details.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | **`ZSH_SPELLINE_CMD`** | (empty) | LLM CLI command (reads stdin, writes stdout) |
 | **`ZSH_SPELLINE_KEYBINDING`** | `^G` (Ctrl+G) | Keybinding to trigger generation |
 | **`ZSH_SPELLINE_HISTORY_KEYBINDING`** | `^[g` (Alt+G) | Keybinding for history search |
-| `ZSH_SPELLINE_LOG_DIR` | (empty) | Directory for prompt/response logs |
-| `ZSH_SPELLINE_MAX_CANDIDATES` | `10` | Max candidates for multi-option responses |
-| `ZSH_SPELLINE_SPINNER` | `braille` | Spinner style: `braille`, `ascii` |
-| `ZSH_SPELLINE_SPINNER_COLOR` | `animated` | Spinner color: `animated`, `plain`, or a color number |
-| `ZSH_SPELLINE_VERBOSE_AFTER` | `15` | Seconds before showing cancel hint (0 = never) |
-| `ZSH_SPELLINE_PROMPT_FUNC` | `_spelline_build_prompt` | Custom prompt generator function |
-| `ZSH_SPELLINE_HISTORY_FILE` | `~/.zsh_spelline_history` | Request history file (empty = no history) |
 
 ### Custom Keybinding
 

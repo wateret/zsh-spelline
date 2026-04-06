@@ -51,8 +51,20 @@ else
   fail=1
 fi
 
+# 6. Verify end-to-end via spelline_query
+ZSH_SPELLINE_CMD="zsh ${REPO_DIR}/tests/mocks/mock_single.sh"
+local output=$(spelline_query "list files")
+if [[ "$output" == "ls -la /tmp" ]]; then
+  echo "ok 4 - spelline_query returns expected result"
+else
+  echo "not ok 4 - spelline_query returns expected result"
+  echo "# got: $output"
+  fail=1
+fi
+
+
 echo ""
-echo "1..3"
+echo "1..4"
 
 # cleanup
 rm -rf ~/.oh-my-zsh
