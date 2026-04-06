@@ -26,3 +26,24 @@ jobs:
 
       - name: Run functional tests
         run: zsh tests/run_all.sh functional
+
+  install-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install zsh
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+
+      - name: Test manual install
+        run: zsh tests/install/test_manual.sh
+
+      - name: Test Oh My Zsh install
+        run: zsh tests/install/test_omz.sh
+
+      - name: Test zinit install
+        run: zsh tests/install/test_zinit.sh
