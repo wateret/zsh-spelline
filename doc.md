@@ -37,6 +37,17 @@ export ZSH_SPELLINE_CMD="my-custom-llm --flag"
 
 The plugin will not work until this variable is set.
 
+## Benchmark Results
+
+| `ZSH_SPELLINE_CMD` | Total | Pass | Fail | Pass Rate |
+|----------|------:|-----:|-----:|----------:|
+| `ollama run qwen2.5-coder:7b` | 70 | 56 | 14 | 80% |
+| `gemini -m gemini-2.5-flash` | 70 | 56 | 14 | 80% |
+| `codex -m gpt-5.4 exec -` | 70 | 63 | 7 | 90% |
+| `claude -p --bare --no-session-persistence` (Opus 4.6) | 70 | 69 | 1 | 99% |
+
+> Results are a snapshot and will vary — LLM and agent backends are non-deterministic, and model behavior changes with service updates.
+
 ## Logging
 
 When `ZSH_SPELLINE_LOG_DIR` is set, each invocation writes a markdown log file containing the config snapshot, prompt, and LLM response.
@@ -85,4 +96,3 @@ spelline_query "find files larger than 1GB"
 ```
 
 Returns 1 if `ZSH_SPELLINE_CMD` is not set, the request is empty, or the LLM returns no result.
-
