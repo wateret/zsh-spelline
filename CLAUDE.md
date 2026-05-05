@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Commands
 
 ```zsh
@@ -16,7 +14,7 @@ No build step — pure zsh plugin.
 
 ## Architecture
 
-`spelline.zsh` is the entire plugin. `zsh-spelline.plugin.zsh` is just `source spelline.zsh` for Oh My Zsh.
+`spelline.zsh` is the entire plugin. `zsh-spelline.plugin.zsh` is just a wrapper for Oh My Zsh.
 
 **Widget flow (`_spelline_generate`):** user buffer → `_spelline_build_prompt` (injects CWD, git status, shell history, tmux scrollback) → stdin of `$ZSH_SPELLINE_CMD` background job → `_spelline_parse_result` → `_spelline_candidates[]` → fzf picker (if multiple) → `BUFFER` replaced.
 
